@@ -16,7 +16,7 @@ instance_type = "t2.medium"
 
 lb_target_group_name = "test-lb-target-group"
 
-lb_target_group_port = 80
+lb_target_group_port = 8080
 
 lb_target_group_protocol = "HTTP"
 
@@ -24,7 +24,7 @@ lb_name = "test-lb"
 
 lb_type = "application"
 
-lb_listener_port = 8080
+lb_listener_port = 80
 
 lb_listener_protocol = "HTTP"
 
@@ -38,4 +38,4 @@ db_engine = "postgres"
 
 db_instance_class = "db.t3.micro"
 
-alert_email = "hadika4872@deapad.com"
+alert_email = "hadika4872@deapad.com" #place your email here to receive alerts

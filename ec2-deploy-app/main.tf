@@ -25,6 +25,7 @@ module "ec2_instance" {
   enable_public_ip_address = true
   key_name                 = aws_key_pair.ec2_kp.key_name
   iam_instance_profile = aws_iam_instance_profile.instance_profile.name
+  is_leader                = count.index == 0 
 }
 
 module "rds" {
@@ -93,7 +94,7 @@ resource "aws_key_pair" "ec2_kp" {
   public_key = trimspace(tls_private_key.key_pair.public_key_openssh)
 }
 
-# Modev due to issues in lab 
+# Moved due to issues in lab 
 
 
 data "aws_iam_policy_document" "assume_role_ec2" {
