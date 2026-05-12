@@ -11,7 +11,7 @@ resource "aws_lb" "app_lb" {
   internal           = false
   load_balancer_type = var.lb_type
   security_groups    = [var.security_group_id]
-  subnets            = [var.public_subnet_id]
+  subnets            = var.public_subnet_id
 
   tags = {
     Name = "app-lb"

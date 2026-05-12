@@ -18,7 +18,7 @@ module "security_group" {
 module "ec2_instance" {
   source                   = "./modules/ec2_instance"
   count                    = 3
-  public_subnet_id         = module.network.public_subnet_id
+  public_subnet_id         = module.network.public_subnet_id[count.index % length(module.network.public_subnet_id)]  
   ec2_security_group_id    = module.security_group.ec2_security_group_id
   ami_id                   = data.aws_ssm_parameter.al2023_ami.value
   instance_type            = var.instance_type
