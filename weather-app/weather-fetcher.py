@@ -20,16 +20,14 @@ from datetime import datetime, timezone
 
 import requests
 import psycopg2
-from kubernetes import client, config
-from kubernetes.client.rest import ApiException
+
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
 LAT = 44.8176
 LON = 20.4633
-NAMESPACE       = os.getenv("NAMESPACE", "weather")
-CONFIGMAP_NAME  = os.getenv("CONFIGMAP_NAME", "weather-data")
+
 
 # RDS — injected from postgres-credentials secret
 DB_HOST = os.getenv("DB_HOST")
@@ -81,29 +79,6 @@ def fetch_weather():
         "fetched_at":     datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
     }
 
-def write_configmap(data):
-    config.load_incluster_config()
-    v1 = client.CoreV1Api()
-
-    cm_body = client.V1ConfigMap(
-        metadata=client.V1ObjectMeta(
-            name=CONFIGMAP_NAME,
-            namespace=NAMESPACE,
-            labels={"app": "weather-fetcher"},
-        ),
-        data={"weather.json": json.dumps(data)},
-    )
-
-    try:
-        v1.read_namespaced_config_map(name=CONFIGMAP_NAME, namespace=NAMESPACE)
-        v1.replace_namespaced_config_map(name=CONFIGMAP_NAME, namespace=NAMESPACE, body=cm_body)
-        logger.info("ConfigMap updated successfully")
-    except ApiException as e:
-        if e.status == 404:
-            v1.create_namespaced_config_map(namespace=NAMESPACE, body=cm_body)
-            logger.info("ConfigMap created successfully")
-        else:
-            raise
 
 def write_to_rds(data):
     """Insert one weather reading row into the weather_readings table."""
@@ -142,13 +117,6 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"Fetch failed: {e}")
         sys.exit(1)
-
-    # Write ConfigMap — non-fatal if it fails
-    try:
-        write_configmap(data)
-    except Exception as e:
-        logger.error(f"ConfigMap write failed: {e}")
-        errors.append("configmap")
 
     # Write to RDS — non-fatal if RDS is unreachable
     try:
