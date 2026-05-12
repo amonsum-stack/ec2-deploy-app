@@ -24,7 +24,7 @@ lb_name = "test-lb"
 
 lb_type = "application"
 
-lb_listener_port = 80
+lb_listener_port = 8080
 
 lb_listener_protocol = "HTTP"
 

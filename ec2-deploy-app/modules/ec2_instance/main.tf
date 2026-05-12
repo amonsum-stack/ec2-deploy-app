@@ -23,8 +23,19 @@ resource "aws_instance" "ec2_instance" {
   key_name = var.key_name
   iam_instance_profile = var.iam_instance_profile
 
-
-  # user_data =  da se instlaira docker i da se pokrene container sa aplikacijom
+user_data = <<-EOF
+  #!/bin/bash
+  dnf update -y
+  dnf install -y docker
+  systemctl start docker
+  systemctl enable docker
+  docker pull igior/weather-app:latest
+  docker run -d \
+    --name weather-app \
+    --restart always \
+    -p 8080:8080 \
+    igior/weather-app:latest
+EOF
 
   tags = {
     Name = "EC2 Deploy App Instance"

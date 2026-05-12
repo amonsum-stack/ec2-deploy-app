@@ -20,8 +20,6 @@ COPY --from=builder /install /usr/local
 
 # Copy application code
 COPY app.py .
-COPY weather-fetcher.py .
-COPY weather-aggregator.py .
 COPY templates/ templates/
 
 # Non-root user for security

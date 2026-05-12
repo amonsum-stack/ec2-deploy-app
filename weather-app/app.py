@@ -29,8 +29,6 @@ from datetime import datetime, timezone
 
 import requests
 from flask import Flask, render_template, jsonify
-from kubernetes import client, config
-from kubernetes.client.rest import ApiException
 from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Gauge
 
@@ -52,8 +50,7 @@ VISIBILITY_GAUGE = Gauge("belgrade_visibility_km",      "Current visibility in B
 # Belgrade coordinates
 LAT = 44.8176
 LON = 20.4633
-NAMESPACE = os.getenv("NAMESPACE", "weather")
-CONFIGMAP_NAME = os.getenv("CONFIGMAP_NAME", "weather-data")
+
 
 # Open-Meteo WMO weather code descriptions
 WMO_CODES = {
@@ -117,24 +114,6 @@ def fetch_from_api():
         "source": "Open-Meteo (live fetch)",
     }
 
-def read_from_configmap():
-    """Read cached weather data from the Kubernetes ConfigMap."""
-    try:
-        config.load_incluster_config()
-        v1 = client.CoreV1Api()
-        cm = v1.read_namespaced_config_map(name=CONFIGMAP_NAME, namespace=NAMESPACE)
-        data = json.loads(cm.data["weather.json"])
-        data["source"] = "Open-Meteo (cached via CronJob)"
-        return data
-    except ApiException as e:
-        if e.status == 404:
-            logger.info("ConfigMap not found yet, fetching directly from API")
-        else:
-            logger.warning(f"ConfigMap read failed ({e.status}), falling back to API")
-        return None
-    except Exception as e:
-        logger.warning(f"ConfigMap read error: {e}, falling back to API")
-        return None
 
 def wind_direction_label(degrees):
     """Convert wind degrees to compass label."""
@@ -152,9 +131,7 @@ def update_gauges(weather):
 
 @app.route("/")
 def index():
-    weather = read_from_configmap()
-    if weather is None:
-        weather = fetch_from_api()
+    weather = fetch_from_api()
     weather["wind_label"] = wind_direction_label(weather.get("wind_direction", 0))
     update_gauges(weather)
     return render_template("index.html", weather=weather)
@@ -166,9 +143,7 @@ def health():
 @app.route("/api/weather")
 def api_weather():
     """Raw JSON endpoint — useful for debugging."""
-    weather = read_from_configmap()
-    if weather is None:
-        weather = fetch_from_api()
+    weather = fetch_from_api()
     return jsonify(weather)
 
 if __name__ == "__main__":
