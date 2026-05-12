@@ -4,6 +4,9 @@ variable "public_subnet_id" {}
 variable "ec2_security_group_id" {}
 variable "enable_public_ip_address" {}
 variable "key_name" {} 
+variable "iam_instance_profile" {}
+
+
 
 output "ec2_instance_id" {
   value = aws_instance.ec2_instance.id
@@ -18,7 +21,7 @@ resource "aws_instance" "ec2_instance" {
   vpc_security_group_ids = [var.ec2_security_group_id]
   associate_public_ip_address = var.enable_public_ip_address
   key_name = var.key_name
-  iam_instance_profile   = aws_iam_instance_profile.instance_profile.name
+  iam_instance_profile = var.iam_instance_profile
 
 
   # user_data =  da se instlaira docker i da se pokrene container sa aplikacijom
@@ -27,32 +30,3 @@ resource "aws_instance" "ec2_instance" {
     Name = "EC2 Deploy App Instance"
   }
 }
-
-data "aws_iam_policy_document" "assume_role_ec2" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "instance_role_secrets_manager" {
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-  role       = aws_iam_role.instance_role.name
-} 
-
-resource "aws_iam_role" "instance_role" {
-  name               = "ec2_deploy_app_instance_role"
-  assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
-}
-
-resource "aws_iam_instance_profile" "instance_profile" {
-  name = "ec2_deploy_app_instance_profile"
-  role = aws_iam_role.instance_role.name
-}
-

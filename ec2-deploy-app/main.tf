@@ -24,6 +24,7 @@ module "ec2_instance" {
   instance_type            = var.instance_type
   enable_public_ip_address = true
   key_name                 = aws_key_pair.ec2_kp.key_name
+  iam_instance_profile = aws_iam_instance_profile.instance_profile.name
 }
 
 module "rds" {
@@ -91,3 +92,35 @@ resource "aws_key_pair" "ec2_kp" {
   key_name   = "ec2_deploy_app_key_pair"
   public_key = trimspace(tls_private_key.key_pair.public_key_openssh)
 }
+
+# Modev due to issues in lab 
+
+
+data "aws_iam_policy_document" "assume_role_ec2" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "instance_role_secrets_manager" {
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+  role       = aws_iam_role.instance_role.name
+} 
+
+resource "aws_iam_role" "instance_role" {
+  name               = "ec2_deploy_app_instance_role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
+}
+
+resource "aws_iam_instance_profile" "instance_profile" {
+  name = "ec2_deploy_app_instance_profile"
+  role = aws_iam_role.instance_role.name
+}
+

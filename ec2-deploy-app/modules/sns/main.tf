@@ -4,10 +4,10 @@ variable "alert_email" {}
 resource "aws_sns_topic" "rds_alarms" {
   name = "rds-alarms"
 
-  tags = {
-   Name    = "rds-alarms"
-  Purpose = "RDS CPU, storage, and status alerts"
-  }
+tags = {
+  Name    = "rds-alarms"
+  Purpose = "RDS CPU, storage, and status alerts" 
+}
 }
 
 resource "aws_sns_topic_subscription" "rds_alarms_email" {
