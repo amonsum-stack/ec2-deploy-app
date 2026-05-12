@@ -40,7 +40,7 @@ resource "aws_lb_target_group_attachment" "ec2_instances" {
 
 
 resource "aws_lb_listener" "front_end" {
-  load_balancer_arn = aws_lb.app_lb.arn
+  load_balancer_arn = var.lb_arn
   port              = var.lb_listener_port
   protocol          = var.lb_listener_protocol
 

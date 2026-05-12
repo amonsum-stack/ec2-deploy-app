@@ -40,4 +40,4 @@ db_engine = "postgres"
 
 db_instance_class = "db.t3.micro"
 
-alert_email = "temp@email"
+alert_email = "hadika4872@deapad.com"

@@ -5,8 +5,8 @@ variable "ec2_security_group_id" {}
 variable "enable_public_ip_address" {}
 variable "key_name" {} 
 
-output "ec2_instance_ids" {
-  value = [aws_instance.ec2_instance.id]
+output "ec2_instance_id" {
+  value = aws_instance.ec2_instance.id
 }
 
 
