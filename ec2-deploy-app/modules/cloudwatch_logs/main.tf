@@ -2,11 +2,10 @@ variable "sns_topic_arn" {
   description = "SNS topic ARN to send WARNING/ERROR alarms to"
 }
 
-# ── Log Groups ────────────────────────────────────────────────────
-
+# Log Groups
+# retention is defult since i had problems in the lab when trying to set a value 
 resource "aws_cloudwatch_log_group" "fetcher" {
   name              = "/weather-app/fetcher"
-  retention_in_days = 7
 
   tags = {
     Name = "weather-fetcher-logs"
@@ -15,7 +14,6 @@ resource "aws_cloudwatch_log_group" "fetcher" {
 
 resource "aws_cloudwatch_log_group" "aggregator" {
   name              = "/weather-app/aggregator"
-  retention_in_days = 7
 
   tags = {
     Name = "weather-aggregator-logs"
@@ -24,15 +22,13 @@ resource "aws_cloudwatch_log_group" "aggregator" {
 
 resource "aws_cloudwatch_log_group" "app" {
   name              = "/weather-app/app"
-  retention_in_days = 7
 
   tags = {
     Name = "weather-app-logs"
   }
 }
 
-# ── Metric Filters ────────────────────────────────────────────────
-# Counts every line containing WARNING or ERROR in each log group
+# Metric Filters 
 
 resource "aws_cloudwatch_log_metric_filter" "fetcher_errors" {
   name           = "fetcher-warnings-errors"

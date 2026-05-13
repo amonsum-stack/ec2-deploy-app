@@ -7,7 +7,6 @@ module "network" {
   us_availability_zone = var.us_availability_zone
 }
 
-# Bastion must come before security_group so we can pass its SG ID in
 module "bastion" {
   source           = "./modules/bastion"
   vpc_id           = module.network.vpc_id
@@ -17,7 +16,6 @@ module "bastion" {
 }
 
 # NAT Gateway in the first public subnet — single NAT to keep costs down
-# For HA you'd deploy one per AZ, but one is fine for this setup
 module "nat" {
   source                 = "./modules/nat"
   public_subnet_id       = module.network.public_subnet_id[0]
@@ -32,8 +30,6 @@ module "security_group" {
   bastion_sg_id                  = module.bastion.bastion_sg_id
 }
 
-# EC2 instances now live in private subnets — no public IPs
-# Outbound internet (Docker pulls, Open-Meteo API) routes via NAT Gateway
 module "ec2_instance" {
   source                = "./modules/ec2_instance"
   count                 = 3
@@ -88,7 +84,6 @@ module "cloudwatch" {
   sns_topic_arn          = module.sns.sns_topic_arn
 }
 
-# Log groups, metric filters, and WARNING/ERROR alarms for fetcher and aggregator
 module "cloudwatch_logs" {
   source        = "./modules/cloudwatch_logs"
   sns_topic_arn = module.sns.sns_topic_arn
@@ -143,7 +138,6 @@ resource "aws_iam_role_policy_attachment" "instance_role_secrets_manager" {
   role       = aws_iam_role.instance_role.name
 }
 
-# Allows the CloudWatch agent on the leader to create log streams and push logs
 resource "aws_iam_role_policy_attachment" "instance_role_cloudwatch" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   role       = aws_iam_role.instance_role.name
@@ -154,7 +148,6 @@ resource "aws_iam_instance_profile" "instance_profile" {
   role = aws_iam_role.instance_role.name
 }
 
-# Outputs — handy after apply
 output "bastion_public_ip" {
   description = "SSH entry point: ssh -i ~/.ssh/ec2-aws.pem ec2-user@<this-ip>"
   value       = module.bastion.bastion_public_ip

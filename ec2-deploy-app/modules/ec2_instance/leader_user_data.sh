@@ -14,7 +14,7 @@ docker run -d \
   -p 8080:8080 \
   igior/weather-app:latest
 
-# ── CloudWatch Agent ──────────────────────────────────────────────
+# CloudWatch Agent 
 
 dnf install -y amazon-cloudwatch-agent
 
@@ -62,7 +62,7 @@ EOF
 systemctl enable amazon-cloudwatch-agent
 systemctl start amazon-cloudwatch-agent
 
-# ── RDS Secret ────────────────────────────────────────────────────
+# RDS Secret 
 
 # Retry fetching secret up to 20 times with 30s delay
 for i in {1..20}; do
@@ -94,7 +94,7 @@ DB_PASS=$(echo $SECRET | python3 -c "import sys,json,base64; print(base64.b64enc
 
 echo "DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME"
 
-# ── DB Schema ─────────────────────────────────────────────────────
+# DB Schema 
 
 docker run --rm \
   -e DB_HOST=$DB_HOST \
@@ -146,7 +146,7 @@ conn.close()
 print('Tables created successfully')
 "
 
-# ── Cron Jobs ─────────────────────────────────────────────────────
+# Cron Jobs 
 
 mkdir -p /etc/cron.d
 
@@ -161,7 +161,7 @@ CRON
 chmod 644 /etc/cron.d/weather-fetcher
 chmod 644 /etc/cron.d/weather-aggregator
 
-# ── Docker app logs → file (for CloudWatch agent to tail) ─────────
+# Docker app logs -> file (for CloudWatch agent to tail) 
 
 # Redirect weather-app container logs to file so CloudWatch agent can ship them
 nohup bash -c 'docker logs -f weather-app >> /var/log/weather-app.log 2>&1' &
