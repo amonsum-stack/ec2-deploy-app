@@ -56,7 +56,7 @@ resource "aws_cloudwatch_log_metric_filter" "aggregator_errors" {
   }
 }
 
-# ── Alarms ────────────────────────────────────────────────────────
+# Alarms 
 
 resource "aws_cloudwatch_metric_alarm" "fetcher_errors" {
   alarm_name          = "weather-fetcher-warnings-errors"
@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "aggregator_errors" {
   }
 }
 
-# ── Outputs ───────────────────────────────────────────────────────
+# Outputs 
 
 output "fetcher_log_group_name" {
   value = aws_cloudwatch_log_group.fetcher.name
