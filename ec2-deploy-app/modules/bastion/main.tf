@@ -45,7 +45,7 @@ resource "aws_security_group" "bastion" {
   }
 }
 
-# Bastion EC2 instance — t2.micro is plenty for a jump host
+# Bastion EC2 instance 
 resource "aws_instance" "bastion" {
   ami                         = var.ami_id
   instance_type               = "t2.micro"

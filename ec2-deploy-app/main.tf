@@ -88,6 +88,12 @@ module "cloudwatch" {
   sns_topic_arn          = module.sns.sns_topic_arn
 }
 
+# Log groups, metric filters, and WARNING/ERROR alarms for fetcher and aggregator
+module "cloudwatch_logs" {
+  source        = "./modules/cloudwatch_logs"
+  sns_topic_arn = module.sns.sns_topic_arn
+}
+
 module "sns" {
   source      = "./modules/sns"
   alert_email = var.alert_email
@@ -134,6 +140,12 @@ resource "aws_iam_role" "instance_role" {
 
 resource "aws_iam_role_policy_attachment" "instance_role_secrets_manager" {
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+  role       = aws_iam_role.instance_role.name
+}
+
+# Allows the CloudWatch agent on the leader to create log streams and push logs
+resource "aws_iam_role_policy_attachment" "instance_role_cloudwatch" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   role       = aws_iam_role.instance_role.name
 }
 
