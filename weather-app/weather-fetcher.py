@@ -129,4 +129,4 @@ if __name__ == "__main__":
         logger.warning(f"Completed with errors in: {errors}")
         sys.exit(1)
     else:
-        logger.info("Done — ConfigMap and RDS updated successfully.")
+        logger.info("Done — RDS updated successfully.")

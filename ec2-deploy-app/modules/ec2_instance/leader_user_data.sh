@@ -14,8 +14,8 @@ docker run -d \
   -p 8080:8080 \
   igior/weather-app:latest
 
-# Retry fetching secret up to 10 times with 30s delay
-for i in {1..10}; do
+# Retry fetching secret up to 20 times with 30s delay
+for i in {1..20}; do
   SECRET=$(aws secretsmanager get-secret-value \
     --secret-id rds/postgres/credentials \
     --region us-east-1 \
@@ -27,12 +27,12 @@ for i in {1..10}; do
     break
   fi
 
-  echo "Secret not ready yet, retrying in 30s... attempt $i/10"
+  echo "Secret not ready yet, retrying in 30s... attempt $i/20"
   sleep 30
 done
 
 if [ -z "$SECRET" ]; then
-  echo "Failed to fetch secret after 10 attempts, exiting"
+  echo "Failed to fetch secret after 20 attempts, exiting"
   exit 1
 fi
 
@@ -40,7 +40,7 @@ DB_HOST=$(echo $SECRET | python3 -c "import sys,json; print(json.load(sys.stdin)
 DB_PORT=$(echo $SECRET | python3 -c "import sys,json; print(json.load(sys.stdin)['port'])")
 DB_NAME=$(echo $SECRET | python3 -c "import sys,json; print(json.load(sys.stdin)['dbname'])")
 DB_USER=$(echo $SECRET | python3 -c "import sys,json; print(json.load(sys.stdin)['username'])")
-DB_PASS=$(echo $SECRET | python3 -c "import sys,json; print(json.load(sys.stdin)['password'])")
+DB_PASS=$(echo $SECRET | python3 -c "import sys,json,base64; print(base64.b64encode(json.load(sys.stdin)['password'].encode()).decode())")
 
 echo "DB_HOST=$DB_HOST DB_PORT=$DB_PORT DB_NAME=$DB_NAME"
 
@@ -49,7 +49,7 @@ docker run --rm \
   -e DB_PORT=$DB_PORT \
   -e DB_NAME=$DB_NAME \
   -e DB_USER=$DB_USER \
-  -e DB_PASS=$DB_PASS \
+  -e DB_PASS=$(echo $DB_PASS | base64 -d) \
   igior/weather-app:latest \
   python3 -c "
 import psycopg2, os
@@ -97,11 +97,11 @@ print('Tables created successfully')
 mkdir -p /etc/cron.d
 
 cat > /etc/cron.d/weather-fetcher << CRON
-*/10 * * * * root docker run --rm -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e "DB_PASS=$DB_PASS" igior/weather-app:latest python3 weather-fetcher.py >> /var/log/weather-fetcher.log 2>&1
+*/10 * * * * root docker run --rm -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PASS=\$(echo $DB_PASS | base64 -d) igior/weather-app:latest python3 weather-fetcher.py >> /var/log/weather-fetcher.log 2>&1
 CRON
 
 cat > /etc/cron.d/weather-aggregator << CRON
-55 * * * * root docker run --rm -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e "DB_PASS=$DB_PASS" igior/weather-app:latest python3 weather-aggregator.py >> /var/log/weather-aggregator.log 2>&1
+55 * * * * root docker run --rm -e DB_HOST=$DB_HOST -e DB_PORT=$DB_PORT -e DB_NAME=$DB_NAME -e DB_USER=$DB_USER -e DB_PASS=\$(echo $DB_PASS | base64 -d) igior/weather-app:latest python3 weather-aggregator.py >> /var/log/weather-aggregator.log 2>&1
 CRON
 
 chmod 644 /etc/cron.d/weather-fetcher

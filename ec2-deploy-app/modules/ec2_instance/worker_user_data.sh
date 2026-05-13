@@ -1,11 +1,9 @@
 #!/bin/bash
 
 dnf update -y
-dnf install -y docker aws-cli python3 cronie
+dnf install -y docker aws-cli python3 
 systemctl start docker
 systemctl enable docker
-systemctl start crond
-systemctl enable crond
 
 docker pull igior/weather-app:latest
 docker run -d \

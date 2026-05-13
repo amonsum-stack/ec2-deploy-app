@@ -1,18 +1,12 @@
 variable "db_username" {}
-
 variable "db_name" {}
-
 variable "db_engine" {}
-
 variable "db_instance_class" {}
-
 variable "private_subnet_ids" {}
-
 variable "rds_security_group_id" {}
 
 
 # DB Subnet Group — RDS requires subnets in at least 2 AZs
-
 resource "aws_db_subnet_group" "postgres" {
   name        = "postgres-subnet-group"
   description = "Private subnets for RDS Postgres"
@@ -25,8 +19,6 @@ resource "aws_db_subnet_group" "postgres" {
 
 
 # Random password for the RDS master user
-
-
 resource "random_password" "db_password" {
   length           = 32
   special          = true
@@ -35,7 +27,6 @@ resource "random_password" "db_password" {
 
 
 # Store credentials in AWS Secrets Manager
-
 resource "aws_secretsmanager_secret" "db_credentials" {
   name                    = "rds/postgres/credentials"
   description             = "RDS Postgres credentials"
@@ -95,8 +86,6 @@ resource "aws_db_instance" "postgres" {
     Name = "rds-${var.db_name}-postgres"
   }
 }
-
-#Outputs
 
 output "rds_endpoint" {
   description = "RDS Postgres endpoint (host:port)"

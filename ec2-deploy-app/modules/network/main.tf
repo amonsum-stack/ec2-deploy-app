@@ -43,7 +43,7 @@ resource "aws_subnet" "public" {
 
 # Create a private subnet for RDS
 resource "aws_subnet" "private" {
-  count = 3
+  count  = length(var.cidr_subnet_private)
   vpc_id = aws_vpc.main.id
   cidr_block = var.cidr_subnet_private[count.index]
   availability_zone = var.us_availability_zone[count.index]
@@ -94,7 +94,7 @@ resource "aws_route_table" "private" {
 
 # Associate private subnet with route table
 resource "aws_route_table_association" "private" {
-  count = 3
+  count = length(var.cidr_subnet_private)
   subnet_id =  aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private.id
 } 

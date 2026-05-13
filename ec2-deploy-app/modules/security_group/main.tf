@@ -15,6 +15,7 @@ output "lb_security_group_id" {
   value = aws_security_group.lb.id
 }
 
+# For SSH access to EC2, aws checks your ip
 data "http" "cloudshell_ip" {
   url = "https://checkip.amazonaws.com/"
 }

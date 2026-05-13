@@ -24,7 +24,7 @@ module "ec2_instance" {
   instance_type            = var.instance_type
   enable_public_ip_address = true
   key_name                 = aws_key_pair.ec2_kp.key_name
-  iam_instance_profile = aws_iam_instance_profile.instance_profile.name
+  iam_instance_profile     = aws_iam_instance_profile.instance_profile.name
   is_leader                = count.index == 0 
 }
 
@@ -41,7 +41,7 @@ module "rds" {
 module "lb" {
   source                          = "./modules/lb"
   vpc_id                          = module.network.vpc_id
-  security_group_id               = module.security_group.lb_security_group_id
+  security_group_id               = [module.security_group.lb_security_group_id]
   lb_name                         = var.lb_name
   lb_type                         = var.lb_type
   public_subnet_id                = module.network.public_subnet_id
@@ -72,7 +72,7 @@ module "sns" {
     alert_email = var.alert_email
 }
 
-# Both the AMI and the key for EC2 is in the main since all three instances need to get these files
+# Both the AMI and the key for EC2 is in the root main since all three instances need to get these files
 # One AMI and one KEY pair is enough for all three instances, so we don't need to create them in the module
 data "aws_ssm_parameter" "al2023_ami" {
   name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
@@ -95,8 +95,6 @@ resource "aws_key_pair" "ec2_kp" {
 }
 
 # Moved due to issues in lab 
-
-
 data "aws_iam_policy_document" "assume_role_ec2" {
   statement {
     effect = "Allow"
@@ -124,4 +122,7 @@ resource "aws_iam_instance_profile" "instance_profile" {
   name = "ec2_deploy_app_instance_profile"
   role = aws_iam_role.instance_role.name
 }
+
+
+
 
