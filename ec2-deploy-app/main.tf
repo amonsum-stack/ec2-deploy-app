@@ -83,12 +83,12 @@ module "cloudwatch" {
   db_instance_identifier = module.rds.db_instance_identifier
   sns_topic_arn          = module.sns.sns_topic_arn
 }
-
+/*
 module "cloudwatch_logs" {
   source        = "./modules/cloudwatch_logs"
   sns_topic_arn = module.sns.sns_topic_arn
 }
-
+*/
 module "sns" {
   source      = "./modules/sns"
   alert_email = var.alert_email
