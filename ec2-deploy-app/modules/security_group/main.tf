@@ -1,9 +1,7 @@
 variable "vpc_id" {}
 variable "ec2_security_group_name" {}
 variable "ec2_security_group_description" {}
-variable "bastion_sg_id" {
-  description = "Security group ID of the bastion host — EC2 SSH is restricted to this SG"
-}
+variable "bastion_sg_id" {}
 
 output "ec2_security_group_id" {
   value = aws_security_group.ec2_sg.id

@@ -1,18 +1,10 @@
-variable "vpc_id" {
-  description = "VPC ID where the bastion host will be placed"
-}
+variable "vpc_id" {}
 
-variable "public_subnet_id" {
-  description = "Public subnet ID for the bastion host"
-}
+variable "public_subnet_id" {}
 
-variable "ami_id" {
-  description = "AMI ID for the bastion host"
-}
+variable "ami_id" {}
 
-variable "key_name" {
-  description = "Key pair name for SSH access"
-}
+variable "key_name" {}
 
 # Fetch the current IP to restrict SSH access
 data "http" "my_ip" {

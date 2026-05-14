@@ -83,12 +83,14 @@ module "cloudwatch" {
   db_instance_identifier = module.rds.db_instance_identifier
   sns_topic_arn          = module.sns.sns_topic_arn
 }
+
 /*
 module "cloudwatch_logs" {
   source        = "./modules/cloudwatch_logs"
   sns_topic_arn = module.sns.sns_topic_arn
 }
 */
+
 module "sns" {
   source      = "./modules/sns"
   alert_email = var.alert_email
@@ -133,6 +135,11 @@ resource "aws_iam_role" "instance_role" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_ec2.json
 }
 
+resource "aws_iam_instance_profile" "instance_profile" {
+  name = "ec2_deploy_app_instance_profile"
+  role = aws_iam_role.instance_role.name
+}
+
 resource "aws_iam_role_policy_attachment" "instance_role_secrets_manager" {
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
   role       = aws_iam_role.instance_role.name
@@ -141,11 +148,6 @@ resource "aws_iam_role_policy_attachment" "instance_role_secrets_manager" {
 resource "aws_iam_role_policy_attachment" "instance_role_cloudwatch" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   role       = aws_iam_role.instance_role.name
-}
-
-resource "aws_iam_instance_profile" "instance_profile" {
-  name = "ec2_deploy_app_instance_profile"
-  role = aws_iam_role.instance_role.name
 }
 
 output "bastion_public_ip" {

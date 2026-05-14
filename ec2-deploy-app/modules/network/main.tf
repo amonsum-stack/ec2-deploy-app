@@ -3,7 +3,9 @@ variable "vpc_name" {}
 variable "cidr_subnet_public" {
   type = list(string)
 }
-variable "cidr_subnet_private" {}
+variable "cidr_subnet_private" {
+  type = list(string)
+}
 variable "us_availability_zone" {}
 
 output "vpc_id" {
@@ -18,7 +20,7 @@ output "private_subnet_id" {
   value = aws_subnet.private[*].id
 }
 
-# Exposed so the NAT module can add a route to it
+# Exposed needed for NAT module to add a route to it
 output "private_route_table_id" {
   value = aws_route_table.private.id
 }

@@ -63,6 +63,26 @@ eval $(ssh-agent -s)
 ssh-add ~/.ssh/ec2-aws.pem
 ssh -A -J ec2-user@<bastion_ip> ec2-user@<private_instance_ip>
 ```
+Finding the ledaer instance is possible by looking at the tags of ec2 instances. The leader will be tagged as "leader".
+When the deployment is complete and you log in on the leader node you can check the following:
+> Cron for weather-fetcher 
+``` bash
+cat /etc/cron.d/weather-fetcher
+```
+> Cron for agregator 
+```bash
+cat /etc/cron.d/weather-aggregator
+```
+> AWS logging agent running
+```bash
+sudo systemctl status amazon-cloudwatch-agent
+```
+> Check if the logs are actually there 
+```bash
+sudo tail -f /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log
+```
+> Lastly you can go to AWS managment console > Cloudwatch > Log Managment and you should see two log groups there. One for fetcher and one for agregator being populated with the logs. Since the cloudwatch_logs module is disabled we can still see the logs but we won't get notifcations/alarms and emails if there are errors or warnings. This needs to be tracked manually.
+
 
 ## Potential Improvements
 

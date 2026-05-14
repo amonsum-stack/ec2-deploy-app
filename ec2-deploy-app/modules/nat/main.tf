@@ -1,10 +1,6 @@
-variable "public_subnet_id" {
-  description = "Public subnet ID where the NAT Gateway will be placed"
-}
+variable "public_subnet_id" {}
 
-variable "private_route_table_id" {
-  description = "Private route table ID to add the NAT Gateway route to"
-}
+variable "private_route_table_id" {}
 
 # Elastic IP for the NAT Gateway
 resource "aws_eip" "nat" {
