@@ -1,0 +1,7 @@
+.infracost/
+.vscode/
+.idea/
+temp.*
+rezerv-ostatak/
+eks-test/
+EKS-gitlab/
