@@ -92,3 +92,4 @@ sudo tail -f /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log
 - **Prometheus + Grafana** — the app already exposes `/metrics` with custom gauges (temperature, humidity, wind speed, pressure, visibility); a dedicated monitoring instance running both tools in Docker would complete the observability stack
 - **HTTPS** — add an ACM certificate and HTTPS listener to the load balancer
 
+Testing some changes 
