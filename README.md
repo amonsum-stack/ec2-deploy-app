@@ -31,6 +31,7 @@ RDS Postgres (private subnets)
 
 ```bash
 terraform init
+terraform plan
 terraform apply
 ```
 
@@ -54,7 +55,7 @@ CloudWatch alarms monitor the RDS instance and send email notifications via SNS:
 - High connection count (> 48/60)
 - Instance availability
 
-> **Note:** CloudWatch log groups and metric filters are implemented in the codebase (`modules/cloudwatch_logs`) but disabled due to lab IAM restrictions (`logs:PutMetricFilter`, `logs:DeleteLogGroup` not permitted). The CloudWatch agent on the leader instance still ships logs <to be confirmed>. The module can be re-enabled on a full AWS account.
+> **Note:** CloudWatch log groups and metric filters are implemented in the codebase (`modules/cloudwatch_logs`) but disabled due to lab IAM restrictions (`logs:PutMetricFilter`, `logs:DeleteLogGroup` not permitted). The CloudWatch agent on the leader instance still ships logs. The module can be re-enabled on a full AWS account.
 
 ## SSH Access
 

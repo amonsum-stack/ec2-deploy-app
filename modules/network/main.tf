@@ -6,9 +6,7 @@ variable "cidr_subnet_public" {
 variable "cidr_subnet_private" {
   type = list(string)
 }
-variable "us_availability_zone" {
-  type = list(string)
-}
+variable "us_availability_zone" {}
 
 output "vpc_id" {
   value = aws_vpc.main.id

@@ -15,7 +15,7 @@ module "bastion" {
   key_name         = aws_key_pair.ec2_kp.key_name
 }
 
-# NAT Gateway in the first public subnet — single NAT
+# NAT Gateway in the first public subnet — single NAT to keep costs down
 module "nat" {
   source                 = "./modules/nat"
   public_subnet_id       = module.network.public_subnet_id[0]
